@@ -118,7 +118,34 @@ namespace NLog.UnitTests.Config
         }
 
         [Fact]
-        public void ParameterConfigurationTest()
+        public void ArrayParameterTest()
+        {
+            LoggingConfiguration c = CreateConfigurationFromString(@"
+            <nlog>
+                <targets>
+                    <target type='MethodCall' name='mct'>
+                        <parameter name='p1' layout='${message}' />
+                        <parameter name='p2' layout='${level}' />
+                        <parameter name='p3' layout='${logger}' />
+                    </target>
+                </targets>
+            </nlog>");
+
+            var t = c.FindTargetByName("mct") as MethodCallTarget;
+            Assert.NotNull(t);
+            Assert.Equal(3, t.Parameters.Count);
+            Assert.Equal("p1", t.Parameters[0].Name);
+            Assert.Equal("'${message}'", t.Parameters[0].Layout.ToString());
+
+            Assert.Equal("p2", t.Parameters[1].Name);
+            Assert.Equal("'${level}'", t.Parameters[1].Layout.ToString());
+
+            Assert.Equal("p3", t.Parameters[2].Name);
+            Assert.Equal("'${logger}'", t.Parameters[2].Layout.ToString());
+        }
+
+        [Fact]
+        public void DatabaseParameterTest()
         {
             LoggingConfiguration c = CreateConfigurationFromString(@"
             <nlog>
