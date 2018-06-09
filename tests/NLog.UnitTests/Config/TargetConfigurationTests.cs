@@ -42,6 +42,7 @@ namespace NLog.UnitTests.Config
     using NLog.Targets;
     using NLog.Targets.Wrappers;
     using System;
+    using System.Data;
     using System.Globalization;
     using System.Text;
     using Xunit;
@@ -117,30 +118,26 @@ namespace NLog.UnitTests.Config
         }
 
         [Fact]
-        public void ArrayParameterTest()
+        public void ParameterConfigurationTest()
         {
             LoggingConfiguration c = CreateConfigurationFromString(@"
             <nlog>
                 <targets>
-                    <target type='MethodCall' name='mct'>
-                        <parameter name='p1' layout='${message}' />
-                        <parameter name='p2' layout='${level}' />
-                        <parameter name='p3' layout='${logger}' />
+                    <target type='database' name='dbt'>
+                        <parameter name='p1' layout='${message}' size='1' precision='2' scale='3' dbtype='time' />
                     </target>
                 </targets>
             </nlog>");
 
-            var t = c.FindTargetByName("mct") as MethodCallTarget;
+            var t = c.FindTargetByName("dbt") as DatabaseTarget;
             Assert.NotNull(t);
-            Assert.Equal(3, t.Parameters.Count);
+            Assert.Equal(1, t.Parameters.Count);
             Assert.Equal("p1", t.Parameters[0].Name);
             Assert.Equal("'${message}'", t.Parameters[0].Layout.ToString());
-
-            Assert.Equal("p2", t.Parameters[1].Name);
-            Assert.Equal("'${level}'", t.Parameters[1].Layout.ToString());
-
-            Assert.Equal("p3", t.Parameters[2].Name);
-            Assert.Equal("'${logger}'", t.Parameters[2].Layout.ToString());
+            Assert.Equal(1, t.Parameters[0].Size);
+            Assert.Equal(2, t.Parameters[0].Precision);
+            Assert.Equal(3, t.Parameters[0].Scale);
+            Assert.Equal(DbType.Time, t.Parameters[0].DbType);
         }
 
         [Fact]
